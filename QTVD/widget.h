@@ -1,25 +1,29 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include <QWidget>
-
-namespace Ui {
-class Widget;
-}
-
-class Widget : public QWidget
+#include <QOpenGLWidget>
+QT_FORWARD_DECLARE_CLASS(Nv12Render)
+QT_FORWARD_DECLARE_CLASS(VideoData)
+class Widget : public QOpenGLWidget
 {
     Q_OBJECT
-
 public:
-    explicit Widget(QWidget *parent = nullptr);
+    Widget(QWidget *parent = nullptr);
     ~Widget();
 
 public slots:
-    void slImage(QImage);
+    void play(QString);
+    void stop();
+
+protected:
+    void initializeGL() override;
+    void paintGL() override;
 
 private:
-    Ui::Widget *ui;
+    Nv12Render *m_render;
+    uchar *m_ptr;
+    int m_width,m_height;
+    VideoData *m_videoData;
 };
 
 #endif // WIDGET_H
