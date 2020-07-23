@@ -2,39 +2,54 @@
 #include <QOpenGLTexture>
 #include <QDebug>
 
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+
+const char* vertexPath = "nofilter.vert";
+const char* fragmentPath = "nofilter.frag";
+
 void Nv12Render::initialize()
 {
     initializeOpenGLFunctions();
-    const char *vsrc =
-            "attribute vec4 vertexIn; \
-             attribute vec4 textureIn; \
-             varying vec4 textureOut;  \
-             void main(void)           \
-             {                         \
-                 gl_Position = vertexIn; \
-                 textureOut = textureIn; \
-             }";
+    glDisable(GL_DEPTH_TEST);
 
-    const char *fsrc =
-            "varying mediump vec4 textureOut;\n"
-            "uniform sampler2D textureY;\n"
-            "uniform sampler2D textureUV;\n"
-            "void main(void)\n"
-            "{\n"
-            "vec3 yuv; \n"
-            "vec3 rgb; \n"
-            "yuv.x = texture2D(textureY, textureOut.st).r - 0.0625; \n"
-            "yuv.y = texture2D(textureUV, textureOut.st).r - 0.5; \n"
-            "yuv.z = texture2D(textureUV, textureOut.st).g - 0.5; \n"
-            "rgb = mat3( 1,       1,         1, \n"
-                        "0,       -0.39465,  2.03211, \n"
-                        "1.13983, -0.58060,  0) * yuv; \n"
-            "gl_FragColor = vec4(rgb, 1); \n"
-            "}\n";
+    // 1. 从文件路径中获取顶点/片段着色器
+    std::string vertexCode;
+    std::string fragmentCode;
+    std::ifstream vShaderFile;
+    std::ifstream fShaderFile;
+    // 保证ifstream对象可以抛出异常：
+    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try
+    {
+        // 打开文件
+        vShaderFile.open(vertexPath);
+        fShaderFile.open(fragmentPath);
+        std::stringstream vShaderStream, fShaderStream;
+        // 读取文件的缓冲内容到数据流中
+        vShaderStream << vShaderFile.rdbuf();
+        fShaderStream << fShaderFile.rdbuf();
+        // 关闭文件处理器
+        vShaderFile.close();
+        fShaderFile.close();
+        // 转换数据流到string
+        vertexCode = vShaderStream.str();
+        fragmentCode = fShaderStream.str();
+    }
+    catch (std::ifstream::failure e)
+    {
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+    }
+    const char* vShaderCode = vertexCode.c_str();
+    const char* fShaderCode = fragmentCode.c_str();
 
-    program.addCacheableShaderFromSourceCode(QOpenGLShader::Vertex,vsrc);
-    program.addCacheableShaderFromSourceCode(QOpenGLShader::Fragment,fsrc);
-    program.link();
+    m_Program.addCacheableShaderFromSourceCode(QOpenGLShader::Vertex, vShaderCode);
+    m_Program.addCacheableShaderFromSourceCode(QOpenGLShader::Fragment, fShaderCode);
+    m_Program.link();
 
     GLfloat points[]{
         -1.0f, 1.0f,
@@ -64,14 +79,14 @@ void Nv12Render::render(uchar *nv12Ptr, int w, int h)
 
     glClearColor(0.5f, 0.5f, 0.7f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_DEPTH_TEST);
 
-    program.bind();
+
+    m_Program.bind();
     vbo.bind();
-    program.enableAttributeArray("vertexIn");
-    program.enableAttributeArray("textureIn");
-    program.setAttributeBuffer("vertexIn",GL_FLOAT, 0, 2, 2*sizeof(GLfloat));
-    program.setAttributeBuffer("textureIn",GL_FLOAT,2 * 4 * sizeof(GLfloat),2,2*sizeof(GLfloat));
+    m_Program.enableAttributeArray("vertexIn");
+    m_Program.enableAttributeArray("textureIn");
+    m_Program.setAttributeBuffer("vertexIn",GL_FLOAT, 0, 2, 2*sizeof(GLfloat));
+    m_Program.setAttributeBuffer("textureIn",GL_FLOAT,2 * 4 * sizeof(GLfloat),2,2*sizeof(GLfloat));
 
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D,idY);
@@ -89,10 +104,10 @@ void Nv12Render::render(uchar *nv12Ptr, int w, int h)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    program.setUniformValue("textureUV",0);
-    program.setUniformValue("textureY",1);
+    m_Program.setUniformValue("textureUV",0);
+    m_Program.setUniformValue("textureY",1);
     glDrawArrays(GL_QUADS,0,4);
-    program.disableAttributeArray("vertexIn");
-    program.disableAttributeArray("textureIn");
-    program.release();
+    m_Program.disableAttributeArray("vertexIn");
+    m_Program.disableAttributeArray("textureIn");
+    m_Program.release();
 }

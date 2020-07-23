@@ -13,7 +13,7 @@ public:
     void render(uchar*nv12Ptr, int w, int h);
 
 private:
-    QOpenGLShaderProgram program;
+    QOpenGLShaderProgram m_Program;
     GLuint idY,idUV;
     QOpenGLBuffer vbo;
 };

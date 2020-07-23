@@ -21,15 +21,18 @@ SOURCES += \
     main.cpp \
     nv12render.cpp \
     videodata.cpp \
-    widget.cpp
+    widget.cpp \
+    yuvplayer.cpp
 
 HEADERS += \
     nv12render.h \
     videodata.h \
-    widget.h
+    widget.h \
+    yuvplayer.h
 
 FORMS += \
-    widget.ui
+    widget.ui \
+    yuvplayer.ui
 
 #添加库
 INCLUDEPATH += $$PWD/ffmpeg/include
