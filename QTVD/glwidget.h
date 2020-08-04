@@ -14,6 +14,11 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 
+#include <QTimer>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 namespace Ui {
 class GLWidget;
@@ -28,6 +33,8 @@ public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
+    QImage MatToQ(const cv::Mat &src);
+
 protected:
     virtual void initializeGL();
     virtual void resizeGL(int w, int h);
@@ -37,6 +44,11 @@ private:
     Ui::GLWidget *ui;
     QOpenGLShaderProgram shaderProgram;
     GLuint VBO, VAO, EBO, texture;
+
+    cv::VideoCapture mVideoCap;
+    cv::Mat mMatSrc;
+    QTimer *mTimer;
+    QImage *mQImage;
 
 };
 
