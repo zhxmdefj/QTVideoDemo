@@ -24,18 +24,15 @@ GLWidget::~GLWidget()
 void GLWidget::initializeGL(){
     this->initializeOpenGLFunctions();
 
-    QString filepath = "G:\\4Git\\QTVideoDemo\\QTVD\\shaders\\triangle.vert";  //图片的绝对路径
-    QString curPath = QDir::currentPath();    //得到当前程序的工作路径为“E:/QtProjects/Qt4_Projects/download/QDir/Test1B”
-    QString relPath = filepath.mid(curPath.length()+1);  //得到图片的相对路径“Resources/567.jpg”
-    std::cout << "Path = " << curPath.toStdString() << std::endl;
-
-    bool success = shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "G:\\4Git\\QTVideoDemo\\QTVD\\shaders\\triangle.vert");
+    bool success = shaderProgram.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/triangle.vert");
     if (!success) {
         qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
         return;
     }
 
-    success = shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "G:\\4Git\\QTVideoDemo\\QTVD\\shaders\\triangle.frag");
+    success = shaderProgram.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/triangle.frag");
     if (!success) {
         qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
         return;
