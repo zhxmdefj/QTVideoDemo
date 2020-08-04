@@ -36,8 +36,7 @@ protected:
 private:
     Ui::GLWidget *ui;
     QOpenGLShaderProgram shaderProgram;
-    QOpenGLBuffer VBO, EBO;
-    QOpenGLVertexArrayObject VAO;
+    GLuint VBO, VAO, EBO, texture;
 
 };
 
