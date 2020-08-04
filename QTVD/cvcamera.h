@@ -20,7 +20,7 @@ class CVCamera : public QWidget
 public:
     explicit CVCamera(QWidget *parent = nullptr);
 
-    QImage MatImageToQt(const cv::Mat &src);
+    QImage MatToQ(const cv::Mat &src);
 
     ~CVCamera();
 
@@ -31,10 +31,10 @@ private slots:
 
 private:
     Ui::CVCamera *ui;
-    cv::VideoCapture cap;
-    cv::Mat src_image;
-    QTimer *timer;
-    QImage *image;
+    cv::VideoCapture mVideoCap;
+    cv::Mat mMatSrc;
+    QTimer *mTimer;
+    QImage *mQImage;
 };
 
 #endif // CVCAMERA_H

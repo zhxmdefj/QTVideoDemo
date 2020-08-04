@@ -6,9 +6,9 @@ CVCamera::CVCamera(QWidget *parent) :
     ui(new Ui::CVCamera)
 {
     ui->setupUi(this);
-    timer = new QTimer(this);
-    image = new QImage();
-    connect(timer,SIGNAL(timeout()),this,SLOT(readFarme()));
+    mTimer = new QTimer(this);
+    mQImage = new QImage();
+    connect(mTimer,SIGNAL(timeout()),this,SLOT(readFarme()));
     connect(ui->open,SIGNAL(clicked()),this,SLOT(on_Open_triggered()));
     connect(ui->close,SIGNAL(clicked()),this,SLOT(on_Stop_triggered()));
 }
@@ -20,28 +20,28 @@ CVCamera::~CVCamera()
 
 void CVCamera::on_Open_triggered()
 {
-    cap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
-    timer->start(33);
+    mVideoCap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
+    mTimer->start(33);
 }
 
 void CVCamera::on_Stop_triggered()
 {
     // 停止读取数据。
-    timer->stop();
-    cap.release();
+    mTimer->stop();
+    mVideoCap.release();
     ui->cameraView->clear();
 }
 
 void CVCamera::readFarme()
 {
-    cap.read(src_image);
+    mVideoCap.read(mMatSrc);
 
-    QImage imag = MatImageToQt(src_image);
+    QImage imag = MatToQ(mMatSrc);
     ui->cameraView->setPixmap(QPixmap::fromImage(imag));
 }
 
 //Mat转成QImage
-QImage CVCamera::MatImageToQt(const cv::Mat &src)
+QImage CVCamera::MatToQ(const cv::Mat &src)
 {
     //CV_8UC1 8位无符号的单通道---灰度图片
     if(src.type() == CV_8UC1)
