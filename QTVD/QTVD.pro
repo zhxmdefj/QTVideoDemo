@@ -19,13 +19,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     cvcamera.cpp \
+    glwidget.cpp \
     main.cpp \
 
 HEADERS += \
     cvcamera.h \
+    glwidget.h
 
 FORMS += \
     cvcamera.ui \
+    glwidget.ui
 
 #添加库
 INCLUDEPATH += $$PWD/ffmpeg/include
