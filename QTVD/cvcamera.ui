@@ -6,21 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>953</width>
-    <height>536</height>
+    <width>1218</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>CVCamera</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="centralwidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>-60</y>
+     <width>911</width>
+     <height>511</height>
+    </rect>
+   </property>
    <widget class="QLabel" name="cameraView">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>10</y>
-      <width>781</width>
-      <height>491</height>
+      <x>-200</x>
+      <y>90</y>
+      <width>831</width>
+      <height>651</height>
      </rect>
     </property>
     <property name="text">
@@ -64,7 +72,16 @@
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>3</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

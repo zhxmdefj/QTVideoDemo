@@ -20,7 +20,7 @@ CVCamera::~CVCamera()
 
 void CVCamera::on_Open_triggered()
 {
-    cap.open(0);
+    cap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
     timer->start(33);
 }
 
