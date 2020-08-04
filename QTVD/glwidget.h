@@ -9,6 +9,12 @@
 #include <QOpenGLShader>
 #include <QOpenGLShaderProgram>
 
+#include <QDebug>
+#include <QOpenGLFunctions>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
+
+
 namespace Ui {
 class GLWidget;
 }
@@ -30,6 +36,8 @@ protected:
 private:
     Ui::GLWidget *ui;
     QOpenGLShaderProgram shaderProgram;
+    QOpenGLBuffer VBO, EBO;
+    QOpenGLVertexArrayObject VAO;
 
 };
 
