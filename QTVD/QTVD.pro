@@ -46,6 +46,23 @@ LIBS    +=  $$PWD/ffmpeg/lib/avcodec.lib \
             $$PWD/ffmpeg/lib/swresample.lib \
             $$PWD/ffmpeg/lib/swscale.lib \
 
+INCLUDEPATH += D:\opencv\build\include
+
+LIBS += D:/opencv/cvbuild/bin/libopencv_videoio440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_video440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_stitching440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_photo440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_objdetect440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_ml440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_imgproc440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_imgcodecs440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_highgui440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_gapi440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_flann440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_features2d440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_dnn440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_core440.dll
+LIBS += D:/opencv/cvbuild/bin/libopencv_calib3d440.dll
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
