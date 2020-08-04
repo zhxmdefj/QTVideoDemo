@@ -18,21 +18,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    cvcamera.cpp \
     main.cpp \
-    nv12render.cpp \
-    videodata.cpp \
-    widget.cpp \
-    yuvplayer.cpp
 
 HEADERS += \
-    nv12render.h \
-    videodata.h \
-    widget.h \
-    yuvplayer.h
+    cvcamera.h \
 
 FORMS += \
-    widget.ui \
-    yuvplayer.ui
+    cvcamera.ui \
 
 #添加库
 INCLUDEPATH += $$PWD/ffmpeg/include
