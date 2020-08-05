@@ -11,12 +11,12 @@ GLWidget::GLWidget(QWidget *parent) :
     EBO(QOpenGLBuffer::IndexBuffer)
 {
     ui->setupUi(this);
-
     mTimer = new QTimer(this);
-    mQImage = new QImage();
-
-    mVideoCap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
-    mTimer->start(33);
+    connect(mTimer, &QTimer::timeout, this, [=]{
+            m_nTimeValue += 5;
+            update();
+        });
+    mTimer->start(40);
 }
 
 GLWidget::~GLWidget()
@@ -85,27 +85,7 @@ void GLWidget::initializeGL(){
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-//    QImage img1 = QImage("./resources/container.jpg").convertToFormat(QImage::Format_RGB888);
-//    if (!img1.isNull()) {
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img1.width(), img1.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, img1.bits());
-//        glGenerateMipmap(GL_TEXTURE_2D);
-//    }
-//    mVideoCap.read(mMatSrc);
-//    if(mMatSrc.elemSize()>0)
-//      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mMatSrc.cols, mMatSrc.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, mMatSrc.data);
-
-    shaderProgram.bind();
-    glUniform1i(shaderProgram.uniformLocation("ourTexture"), 0);
-    shaderProgram.release();
+    mVideoCap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
 
 }
 
@@ -114,26 +94,62 @@ void GLWidget::resizeGL(int w, int h){
 }
 
 void GLWidget::paintGL(){
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    mVideoCap.read(mMatSrc);
-    if(mMatSrc.elemSize()>0)
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mMatSrc.cols, mMatSrc.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, mMatSrc.data);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    shaderProgram.bind();
-
-    glActiveTexture(GL_TEXTURE0);
+    // texture
+    glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   // set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // render container
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // 读取视频帧
+    mVideoCap.read(mFrame);
 
-    shaderProgram.release();
+    std::cout<<currentFrame<<std::endl;
+
+    // create transformations
+        QMatrix4x4 transform;
+        transform.translate(QVector3D(0.5f, -0.5f, 0.0f));
+        transform.rotate(m_nTimeValue, QVector3D(0.0f, 0.0f, 1.0f));
+
+    if(flag == 0){
+        // 设置每n帧获取一次帧
+        if (currentFrame % 1 == 0) {
+            mMatSrc = mFrame;
+            if (currentFrame >= 1000) {
+                flag = 1;
+            }
+            currentFrame++;
+        }
+        if(mMatSrc.elemSize()>0){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mMatSrc.cols, mMatSrc.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, mMatSrc.data);
+        }
+        shaderProgram.bind();
+
+        int transformLoc = shaderProgram.uniformLocation("transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.data());
+
+        glUniform1i(shaderProgram.uniformLocation("ourTexture"), 0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        // render container
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        shaderProgram.release();
+    }
+
 
 }
 

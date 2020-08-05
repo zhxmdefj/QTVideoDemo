@@ -12,6 +12,6 @@ int main(int argc, char *argv[])
     glWindow.setWindowTitle(QObject::tr("GlWindow"));
     qtGlWindow.setWindowTitle(QObject::tr("QtGlWindow"));
     glWindow.show();
-    qtGlWindow.show();
+    //qtGlWindow.show();
     return a.exec();
 }

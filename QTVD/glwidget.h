@@ -20,6 +20,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <iostream>
+
 namespace Ui {
 class GLWidget;
 }
@@ -47,8 +49,15 @@ private:
 
     cv::VideoCapture mVideoCap;
     cv::Mat mMatSrc;
+    cv::Mat mFrame;
     QTimer *mTimer;
     QImage *mQImage;
+
+    int flag = 0;
+    long currentFrame = 0;
+    long totalFrameNumber = 0;
+
+    int m_nTimeValue = 0;
 
 };
 
