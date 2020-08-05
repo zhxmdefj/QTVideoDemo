@@ -15,7 +15,7 @@ GLWidget::GLWidget(QWidget *parent) :
     connect(mTimer, &QTimer::timeout, this, [=]{
             m_nTimeValue += 5;
             update();
-        });
+    });
     mTimer->start(40);
 }
 
@@ -87,6 +87,15 @@ void GLWidget::initializeGL(){
 
     mVideoCap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
 
+    // create transformations
+    QMatrix4x4 transform;
+    transform.rotate(180, QVector3D(0.0f, 0.0f, 0.0f));
+
+    shaderProgram.bind();
+    int transformLoc = shaderProgram.uniformLocation("transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.data());
+    shaderProgram.release();
+
 }
 
 void GLWidget::resizeGL(int w, int h){
@@ -116,11 +125,6 @@ void GLWidget::paintGL(){
 
     std::cout<<currentFrame<<std::endl;
 
-    // create transformations
-        QMatrix4x4 transform;
-        transform.translate(QVector3D(0.5f, -0.5f, 0.0f));
-        transform.rotate(m_nTimeValue, QVector3D(0.0f, 0.0f, 1.0f));
-
     if(flag == 0){
         // 设置每n帧获取一次帧
         if (currentFrame % 1 == 0) {
@@ -135,14 +139,9 @@ void GLWidget::paintGL(){
         }
         shaderProgram.bind();
 
-        int transformLoc = shaderProgram.uniformLocation("transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.data());
-
-        glUniform1i(shaderProgram.uniformLocation("ourTexture"), 0);
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
-
+        glUniform1i(shaderProgram.uniformLocation("ourTexture"), 0);
         // render container
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
