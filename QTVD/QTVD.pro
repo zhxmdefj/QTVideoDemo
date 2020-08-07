@@ -21,12 +21,14 @@ SOURCES += \
     cvcamera.cpp \
     glwidget.cpp \
     main.cpp \
-    qtglwidget.cpp
+    qtglwidget.cpp \
+    shader.cpp
 
 HEADERS += \
     cvcamera.h \
     glwidget.h \
-    qtglwidget.h
+    qtglwidget.h \
+    shader.h
 
 FORMS += \
     cvcamera.ui \

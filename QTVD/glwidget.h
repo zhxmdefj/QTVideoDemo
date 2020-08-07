@@ -22,6 +22,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace Ui {
 class GLWidget;
 }
@@ -44,8 +46,11 @@ protected:
 
 private:
     Ui::GLWidget *ui;
-    QOpenGLShaderProgram shaderProgram;
-    GLuint VBO, VAO, EBO, texture;
+    QOpenGLShaderProgram shaderProgram, screenShaderProgram;
+    GLuint VBO, VAO, EBO, texture, quadVAO, quadVBO;
+    GLuint framebuffer;
+    GLuint textureColorbuffer;
+    GLuint rbo;
 
     cv::VideoCapture mVideoCap;
     cv::Mat mMatSrc;
