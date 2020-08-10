@@ -262,6 +262,7 @@ void GLWidget::paintGL(){
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     FBOShader1.release();
+
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
     // FBO2 End
 
