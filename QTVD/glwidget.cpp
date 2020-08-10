@@ -29,7 +29,7 @@ GLWidget::~GLWidget()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteBuffers(1, &framebuffer);
+    glDeleteBuffers(1, &FBO1);
 
     mTimer->stop();
     mVideoCap.release();
@@ -42,43 +42,56 @@ void GLWidget::initializeGL(){
 
     this->initializeOpenGLFunctions();
 
-    Shader shader1("./shaders/NoFilter.vert","./shaders/NoFilter.frag");
-
+    // normal
     bool success = shaderProgram.addShaderFromSourceFile(
                 QOpenGLShader::Vertex, "./shaders/NoFilter.vert");
     if (!success) {
         qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
         return;
     }
-
     success = shaderProgram.addShaderFromSourceFile(
                 QOpenGLShader::Fragment, "./shaders/NoFilter.frag");
     if (!success) {
         qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
         return;
     }
-
     success = shaderProgram.link();
     if(!success) {
         qDebug() << "shaderProgram link failed!" << shaderProgram.log();
     }
 
-
-    success = screenShaderProgram.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/screenShader.vert");
+    // FBOShader1
+    success = FBOShader1.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/FBOShader1.vert");
     if (!success) {
         qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
         return;
     }
-
-    success = screenShaderProgram.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/screenShader.frag");
+    success = FBOShader1.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/FBOShader1.frag");
     if (!success) {
         qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
         return;
     }
+    success = FBOShader1.link();
+    if(!success) {
+        qDebug() << "shaderProgram link failed!" << shaderProgram.log();
+    }
 
-    success = screenShaderProgram.link();
+    // FBOShader2
+    success = FBOShader2.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/FBOShader2.vert");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        return;
+    }
+    success = FBOShader2.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/FBOShader2.frag");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        return;
+    }
+    success = FBOShader2.link();
     if(!success) {
         qDebug() << "shaderProgram link failed!" << shaderProgram.log();
     }
@@ -160,21 +173,40 @@ void GLWidget::initializeGL(){
     shaderProgram.release();
 
 
-    // framebuffer configuration
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // framebuffer1
+    glGenFramebuffers(1, &FBO1);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO1);
 
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glGenTextures(1, &FBOtexture1);
+    glBindTexture(GL_TEXTURE_2D, FBOtexture1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOtexture1, 0);
 
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glGenRenderbuffers(1, &RBO1);
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO1);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO1); // now actually attach it
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // framebuffer2
+    glGenFramebuffers(1, &FBO2);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO2);
+
+    glGenTextures(1, &FBOtexture2);
+    glBindTexture(GL_TEXTURE_2D, FBOtexture2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOtexture2, 0);
+
+    glGenRenderbuffers(1, &RBO2);
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO2);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO2); // now actually attach it
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -187,8 +219,8 @@ void GLWidget::resizeGL(int w, int h){
 
 void GLWidget::paintGL(){
 
-    // FBO Start
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // FBO1 Start
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO1);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -218,14 +250,27 @@ void GLWidget::paintGL(){
     }
     shaderProgram.release();
 
-    // FBO End
+    // FBO1 End
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 
-    screenShaderProgram.bind();
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glUniform1i(screenShaderProgram.uniformLocation("screenTexture"), 0);
+
+    // FBO2 Start
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO2);
+    FBOShader1.bind();
+    glBindTexture(GL_TEXTURE_2D, FBOtexture1);
+    glUniform1i(FBOShader1.uniformLocation("screenTexture"), 0);
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    screenShaderProgram.release();
+    FBOShader1.release();
+    glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+    // FBO2 End
+
+    // default FBO
+    FBOShader2.bind();
+    glBindTexture(GL_TEXTURE_2D, FBOtexture2);
+    glUniform1i(FBOShader2.uniformLocation("screenTexture"), 0);
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    FBOShader2.release();
 
 }

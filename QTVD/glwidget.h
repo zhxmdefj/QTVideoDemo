@@ -46,11 +46,11 @@ protected:
 
 private:
     Ui::GLWidget *ui;
-    QOpenGLShaderProgram shaderProgram, screenShaderProgram;
+    QOpenGLShaderProgram shaderProgram, FBOShader1, FBOShader2;
     GLuint VBO, VAO, EBO, texture, quadVAO, quadVBO;
-    GLuint framebuffer;
-    GLuint textureColorbuffer;
-    GLuint rbo;
+    GLuint FBO1, FBO2;
+    GLuint FBOtexture1, FBOtexture2;
+    GLuint RBO1, RBO2;
 
     cv::VideoCapture mVideoCap;
     cv::Mat mMatSrc;
