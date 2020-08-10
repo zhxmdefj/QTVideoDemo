@@ -13,7 +13,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
-
+#include <QSlider>
+#include <QSpinBox>
 #include <QTimer>
 
 #include <opencv2/core/core.hpp>
@@ -57,6 +58,11 @@ private:
     cv::Mat mFrame;
     QTimer *mTimer;
     QImage *mQImage;
+
+    QSlider *pSlider1;
+    QSpinBox *pSpinBox1;
+    QSlider *pSlider2;
+    QSpinBox *pSpinBox2;
 
     int flag = 0;
     long currentFrame = 0;

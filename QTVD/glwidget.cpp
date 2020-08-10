@@ -22,6 +22,37 @@ GLWidget::GLWidget(QWidget *parent) :
     });
     mTimer->start(40);
 
+    int nMin = 0;
+    int nMax = 100;
+    int nSingleStep = 10;
+
+    pSpinBox1 = ui->spinBox;
+    pSpinBox1->setMinimum(nMin);  // 最小值
+    pSpinBox1->setMaximum(nMax);  // 最大值
+    pSpinBox1->setSingleStep(nSingleStep);  // 步长
+    pSlider1 = ui->verticalSlider;
+    pSlider1->setOrientation(Qt::Vertical);  // 水平方向
+    pSlider1->setMinimum(nMin);  // 最小值
+    pSlider1->setMaximum(nMax);  // 最大值
+    pSlider1->setSingleStep(nSingleStep);  // 步长
+    connect(pSpinBox1, SIGNAL(valueChanged(int)), pSlider1, SLOT(setValue(int)));
+    connect(pSlider1, SIGNAL(valueChanged(int)), pSpinBox1, SLOT(setValue(int)));
+
+    pSpinBox2 = ui->spinBox_2;
+    pSpinBox2->setMinimum(nMin);  // 最小值
+    pSpinBox2->setMaximum(nMax);  // 最大值
+    pSpinBox2->setSingleStep(nSingleStep);  // 步长
+    pSlider2 = ui->verticalSlider_2;
+    pSlider2->setOrientation(Qt::Vertical);  // 水平方向
+    pSlider2->setMinimum(nMin);  // 最小值
+    pSlider2->setMaximum(nMax);  // 最大值
+    pSlider2->setSingleStep(nSingleStep);  // 步长
+    connect(pSpinBox2, SIGNAL(valueChanged(int)), pSlider2, SLOT(setValue(int)));
+    connect(pSlider2, SIGNAL(valueChanged(int)), pSpinBox2, SLOT(setValue(int)));
+
+    pSpinBox1->setValue(50);
+    pSpinBox2->setValue(50);
+
 }
 
 GLWidget::~GLWidget()
@@ -253,16 +284,16 @@ void GLWidget::paintGL(){
     // FBO1 End
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 
-
     // FBO2 Start
     glBindFramebuffer(GL_FRAMEBUFFER, FBO2);
     FBOShader1.bind();
     glBindTexture(GL_TEXTURE_2D, FBOtexture1);
     glUniform1i(FBOShader1.uniformLocation("screenTexture"), 0);
+    glUniform1f(FBOShader1.uniformLocation("tint"), pSlider1->value());
+    glUniform1f(FBOShader1.uniformLocation("temperature"), pSlider2->value());
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     FBOShader1.release();
-
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
     // FBO2 End
 
