@@ -51,6 +51,7 @@ private:
     QOpenGLShaderProgram shaderLast;
     QOpenGLShaderProgram shaderWhitebalance;
     QOpenGLShaderProgram shaderBrightness;
+    QOpenGLShaderProgram shaderSaturation;
     GLuint VBO, VAO, EBO, texture, quadVAO, quadVBO;
     GLuint FBO1, FBO2;
     GLuint FBOtexture1, FBOtexture2;
@@ -72,6 +73,8 @@ private:
 
     QSlider *pSlider1sw;
     QSpinBox *pSpinBox1sw;
+    QSlider *pSlider2sw;
+    QSpinBox *pSpinBox2sw;
 
     int flag = 0;
     long currentFrame = 0;

@@ -64,11 +64,24 @@ GLWidget::GLWidget(QWidget *parent) :
     connect(pSlider1sw, SIGNAL(valueChanged(int)), pSpinBox1sw, SLOT(setValue(int)));
 
 
+    pSpinBox2sw = ui->spinBox_4;
+    pSpinBox2sw->setMinimum(nMin);  // 最小值
+    pSpinBox2sw->setMaximum(nMax);  // 最大值
+    pSpinBox2sw->setSingleStep(nSingleStep);  // 步长
+    pSlider2sw = ui->verticalSlider_4;
+    pSlider2sw->setOrientation(Qt::Vertical);  // 水平方向
+    pSlider2sw->setMinimum(nMin);  // 最小值
+    pSlider2sw->setMaximum(nMax);  // 最大值
+    pSlider2sw->setSingleStep(nSingleStep);  // 步长
+    connect(pSpinBox2sw, SIGNAL(valueChanged(int)), pSlider2sw, SLOT(setValue(int)));
+    connect(pSlider2sw, SIGNAL(valueChanged(int)), pSpinBox2sw, SLOT(setValue(int)));
+
 
     pSpinBox1->setValue(50);
     pSpinBox2->setValue(50);
 
     pSpinBox1sw->setValue(50);
+    pSpinBox2sw->setValue(50);
 
 }
 
@@ -90,7 +103,7 @@ void GLWidget::initializeGL(){
 
     this->initializeOpenGLFunctions();
 
-    // normal
+    // shaderFirst
     bool success = shaderFirst.addShaderFromSourceFile(
                 QOpenGLShader::Vertex, "./shaders/shaderFirst.vert");
     if (!success) {
@@ -108,25 +121,7 @@ void GLWidget::initializeGL(){
         qDebug() << "shaderProgram link failed!" << shaderFirst.log();
     }
 
-    // FBOShader1
-    success = shaderWhitebalance.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/whitebalance.vert");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
-        return;
-    }
-    success = shaderWhitebalance.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/whitebalance.frag");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
-        return;
-    }
-    success = shaderWhitebalance.link();
-    if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
-    }
-
-    // FBOShader2
+    // shaderLast
     success = shaderLast.addShaderFromSourceFile(
                 QOpenGLShader::Vertex, "./shaders/shaderLast.vert");
     if (!success) {
@@ -144,25 +139,59 @@ void GLWidget::initializeGL(){
         qDebug() << "shaderProgram link failed!" << shaderFirst.log();
     }
 
+    // shaderWhitebalance
+    success = shaderWhitebalance.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/whitebalance.vert");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderWhitebalance.log();
+        return;
+    }
+    success = shaderWhitebalance.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/whitebalance.frag");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderWhitebalance.log();
+        return;
+    }
+    success = shaderWhitebalance.link();
+    if(!success) {
+        qDebug() << "shaderProgram link failed!" << shaderWhitebalance.log();
+    }
 
-    // FBOShader1sw
+    // shaderBrightness
     success = shaderBrightness.addShaderFromSourceFile(
                 QOpenGLShader::Vertex, "./shaders/brightness.vert");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderBrightness.log();
         return;
     }
     success = shaderBrightness.addShaderFromSourceFile(
                 QOpenGLShader::Fragment, "./shaders/brightness.frag");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderBrightness.log();
         return;
     }
     success = shaderBrightness.link();
     if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
+        qDebug() << "shaderProgram link failed!" << shaderBrightness.log();
     }
 
+    // shaderSaturation
+    success = shaderSaturation.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/saturation.vert");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderSaturation.log();
+        return;
+    }
+    success = shaderSaturation.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/saturation.frag");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderSaturation.log();
+        return;
+    }
+    success = shaderSaturation.link();
+    if(!success) {
+        qDebug() << "shaderProgram link failed!" << shaderSaturation.log();
+    }
 
 
     //VAO，VBO data
@@ -338,10 +367,19 @@ void GLWidget::paintGL(){
     glDrawArrays(GL_TRIANGLES, 0, 6);
     shaderBrightness.release();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO2);
+    shaderSaturation.bind();
+    glBindTexture(GL_TEXTURE_2D, FBOtexture1);
+    glUniform1i(shaderSaturation.uniformLocation("screenTexture"), 0);
+    glUniform1f(shaderSaturation.uniformLocation("saturation"), pSlider2sw->value());
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    shaderSaturation.release();
+
     // default FBO
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
     shaderLast.bind();
-    glBindTexture(GL_TEXTURE_2D, FBOtexture1);
+    glBindTexture(GL_TEXTURE_2D, FBOtexture2);
     glUniform1i(shaderLast.uniformLocation("screenTexture"), 0);
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
