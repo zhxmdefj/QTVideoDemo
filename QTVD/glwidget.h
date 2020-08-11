@@ -47,10 +47,10 @@ protected:
 
 private:
     Ui::GLWidget *ui;
-    QOpenGLShaderProgram shaderProgram;
-    QOpenGLShaderProgram FBOShader1;
-    QOpenGLShaderProgram FBOShader2;
-    QOpenGLShaderProgram FBOShader1sw;
+    QOpenGLShaderProgram shaderFirst;
+    QOpenGLShaderProgram shaderLast;
+    QOpenGLShaderProgram shaderWhitebalance;
+    QOpenGLShaderProgram shaderBrightness;
     GLuint VBO, VAO, EBO, texture, quadVAO, quadVBO;
     GLuint FBO1, FBO2;
     GLuint FBOtexture1, FBOtexture2;

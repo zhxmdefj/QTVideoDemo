@@ -91,76 +91,76 @@ void GLWidget::initializeGL(){
     this->initializeOpenGLFunctions();
 
     // normal
-    bool success = shaderProgram.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/NoFilter.vert");
+    bool success = shaderFirst.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/shaderFirst.vert");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = shaderProgram.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/NoFilter.frag");
+    success = shaderFirst.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/shaderFirst.frag");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = shaderProgram.link();
+    success = shaderFirst.link();
     if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
     }
 
     // FBOShader1
-    success = FBOShader1.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/FBOShader1.vert");
+    success = shaderWhitebalance.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/whitebalance.vert");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = FBOShader1.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/FBOShader1.frag");
+    success = shaderWhitebalance.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/whitebalance.frag");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = FBOShader1.link();
+    success = shaderWhitebalance.link();
     if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
     }
 
     // FBOShader2
-    success = FBOShader2.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/FBOShader2.vert");
+    success = shaderLast.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/shaderLast.vert");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = FBOShader2.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/FBOShader2.frag");
+    success = shaderLast.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/shaderLast.frag");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = FBOShader2.link();
+    success = shaderLast.link();
     if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
     }
 
 
     // FBOShader1sw
-    success = FBOShader1sw.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/FBOShader1sw.vert");
+    success = shaderBrightness.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/brightness.vert");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = FBOShader1sw.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/FBOShader1sw.frag");
+    success = shaderBrightness.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/brightness.frag");
     if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
         return;
     }
-    success = FBOShader1sw.link();
+    success = shaderBrightness.link();
     if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderProgram.log();
+        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
     }
 
 
@@ -234,10 +234,10 @@ void GLWidget::initializeGL(){
     QMatrix4x4 transform;
     transform.rotate(180, QVector3D(0.0f, 0.0f, 0.0f));
 
-    shaderProgram.bind();
-    int transformLoc = shaderProgram.uniformLocation("transform");
+    shaderFirst.bind();
+    int transformLoc = shaderFirst.uniformLocation("transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.data());
-    shaderProgram.release();
+    shaderFirst.release();
 
 
     // framebuffer1
@@ -297,7 +297,7 @@ void GLWidget::paintGL(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // 读取视频帧
     mVideoCap.read(mFrame);
-    shaderProgram.bind();
+    shaderFirst.bind();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     if(flag == 0){
@@ -313,38 +313,38 @@ void GLWidget::paintGL(){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mMatSrc.cols, mMatSrc.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, mMatSrc.data);
         }
         glBindVertexArray(VAO);
-        glUniform1i(shaderProgram.uniformLocation("ourTexture"), 0);
+        glUniform1i(shaderFirst.uniformLocation("ourTexture"), 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
-    shaderProgram.release();
+    shaderFirst.release();
 
     // FBO2 Start
     glBindFramebuffer(GL_FRAMEBUFFER, FBO2);
-    FBOShader1.bind();
+    shaderWhitebalance.bind();
     glBindTexture(GL_TEXTURE_2D, FBOtexture1);
-    glUniform1i(FBOShader1.uniformLocation("screenTexture"), 0);
-    glUniform1f(FBOShader1.uniformLocation("tint"), pSlider1->value());
-    glUniform1f(FBOShader1.uniformLocation("temperature"), pSlider2->value());
+    glUniform1i(shaderWhitebalance.uniformLocation("screenTexture"), 0);
+    glUniform1f(shaderWhitebalance.uniformLocation("tint"), pSlider1->value());
+    glUniform1f(shaderWhitebalance.uniformLocation("temperature"), pSlider2->value());
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    FBOShader1.release();
+    shaderWhitebalance.release();
 
     glBindFramebuffer(GL_FRAMEBUFFER, FBO1);
-    FBOShader1sw.bind();
+    shaderBrightness.bind();
     glBindTexture(GL_TEXTURE_2D, FBOtexture2);
-    glUniform1i(FBOShader1sw.uniformLocation("screenTexture"), 0);
-    glUniform1f(FBOShader1sw.uniformLocation("brightness"), pSlider1sw->value());
+    glUniform1i(shaderBrightness.uniformLocation("screenTexture"), 0);
+    glUniform1f(shaderBrightness.uniformLocation("brightness"), pSlider1sw->value());
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    FBOShader1sw.release();
+    shaderBrightness.release();
 
     // default FBO
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
-    FBOShader2.bind();
+    shaderLast.bind();
     glBindTexture(GL_TEXTURE_2D, FBOtexture1);
-    glUniform1i(FBOShader2.uniformLocation("screenTexture"), 0);
+    glUniform1i(shaderLast.uniformLocation("screenTexture"), 0);
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    FBOShader2.release();
+    shaderLast.release();
 
 }
