@@ -50,8 +50,25 @@ GLWidget::GLWidget(QWidget *parent) :
     connect(pSpinBox2, SIGNAL(valueChanged(int)), pSlider2, SLOT(setValue(int)));
     connect(pSlider2, SIGNAL(valueChanged(int)), pSpinBox2, SLOT(setValue(int)));
 
+
+    pSpinBox1sw = ui->spinBox_3;
+    pSpinBox1sw->setMinimum(nMin);  // 最小值
+    pSpinBox1sw->setMaximum(nMax);  // 最大值
+    pSpinBox1sw->setSingleStep(nSingleStep);  // 步长
+    pSlider1sw = ui->verticalSlider_3;
+    pSlider1sw->setOrientation(Qt::Vertical);  // 水平方向
+    pSlider1sw->setMinimum(nMin);  // 最小值
+    pSlider1sw->setMaximum(nMax);  // 最大值
+    pSlider1sw->setSingleStep(nSingleStep);  // 步长
+    connect(pSpinBox1sw, SIGNAL(valueChanged(int)), pSlider1sw, SLOT(setValue(int)));
+    connect(pSlider1sw, SIGNAL(valueChanged(int)), pSpinBox1sw, SLOT(setValue(int)));
+
+
+
     pSpinBox1->setValue(50);
     pSpinBox2->setValue(50);
+
+    pSpinBox1sw->setValue(50);
 
 }
 
@@ -68,8 +85,8 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL(){
 
-    int SCR_WIDTH = this->geometry().x();
-    int SCR_HEIGHT = this->geometry().y();
+    int SCR_WIDTH = this->geometry().width();
+    int SCR_HEIGHT = this->geometry().height();
 
     this->initializeOpenGLFunctions();
 
@@ -123,6 +140,25 @@ void GLWidget::initializeGL(){
         return;
     }
     success = FBOShader2.link();
+    if(!success) {
+        qDebug() << "shaderProgram link failed!" << shaderProgram.log();
+    }
+
+
+    // FBOShader1sw
+    success = FBOShader1sw.addShaderFromSourceFile(
+                QOpenGLShader::Vertex, "./shaders/FBOShader1sw.vert");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        return;
+    }
+    success = FBOShader1sw.addShaderFromSourceFile(
+                QOpenGLShader::Fragment, "./shaders/FBOShader1sw.frag");
+    if (!success) {
+        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();
+        return;
+    }
+    success = FBOShader1sw.link();
     if(!success) {
         qDebug() << "shaderProgram link failed!" << shaderProgram.log();
     }
@@ -242,6 +278,9 @@ void GLWidget::initializeGL(){
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    currentFBO = FBO1;
+    currentFBOtexture = FBO1;
+
 }
 
 void GLWidget::resizeGL(int w, int h){
@@ -250,16 +289,14 @@ void GLWidget::resizeGL(int w, int h){
 
 void GLWidget::paintGL(){
 
-    // FBO1 Start
+    //cout<<currentFrame<<endl;
+
+    // 第一次采样 FBO1 start
     glBindFramebuffer(GL_FRAMEBUFFER, FBO1);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // 读取视频帧
     mVideoCap.read(mFrame);
-
-    cout<<currentFrame<<endl;
-
     shaderProgram.bind();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -281,9 +318,6 @@ void GLWidget::paintGL(){
     }
     shaderProgram.release();
 
-    // FBO1 End
-    glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
-
     // FBO2 Start
     glBindFramebuffer(GL_FRAMEBUFFER, FBO2);
     FBOShader1.bind();
@@ -294,12 +328,20 @@ void GLWidget::paintGL(){
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     FBOShader1.release();
-    glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
-    // FBO2 End
+
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO1);
+    FBOShader1sw.bind();
+    glBindTexture(GL_TEXTURE_2D, FBOtexture2);
+    glUniform1i(FBOShader1sw.uniformLocation("screenTexture"), 0);
+    glUniform1f(FBOShader1sw.uniformLocation("brightness"), pSlider1sw->value());
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    FBOShader1sw.release();
 
     // default FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
     FBOShader2.bind();
-    glBindTexture(GL_TEXTURE_2D, FBOtexture2);
+    glBindTexture(GL_TEXTURE_2D, FBOtexture1);
     glUniform1i(FBOShader2.uniformLocation("screenTexture"), 0);
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

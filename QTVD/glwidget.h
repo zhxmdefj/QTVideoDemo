@@ -47,10 +47,16 @@ protected:
 
 private:
     Ui::GLWidget *ui;
-    QOpenGLShaderProgram shaderProgram, FBOShader1, FBOShader2;
+    QOpenGLShaderProgram shaderProgram;
+    QOpenGLShaderProgram FBOShader1;
+    QOpenGLShaderProgram FBOShader2;
+    QOpenGLShaderProgram FBOShader1sw;
     GLuint VBO, VAO, EBO, texture, quadVAO, quadVBO;
     GLuint FBO1, FBO2;
     GLuint FBOtexture1, FBOtexture2;
+    GLuint currentFBO;
+    GLuint currentFBOtexture;
+    QOpenGLShaderProgram currentShader;
     GLuint RBO1, RBO2;
 
     cv::VideoCapture mVideoCap;
@@ -63,6 +69,9 @@ private:
     QSpinBox *pSpinBox1;
     QSlider *pSlider2;
     QSpinBox *pSpinBox2;
+
+    QSlider *pSlider1sw;
+    QSpinBox *pSpinBox1sw;
 
     int flag = 0;
     long currentFrame = 0;
