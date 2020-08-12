@@ -82,6 +82,10 @@ private:
 
     int m_nTimeValue = 0;
 
+    void createShader();
+    void createShaderProgram(QOpenGLShaderProgram &shaderProgram,
+                             const char* vertexPath, const char* fragmentPath);
+
 };
 
 #endif // GLWIDGET_H

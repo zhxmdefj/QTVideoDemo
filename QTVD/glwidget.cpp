@@ -1,8 +1,6 @@
 #include "glwidget.h"
 #include "ui_glwidget.h"
 
-#include "shader.h"
-
 #include <QDebug>
 #include <QTimer>
 
@@ -49,7 +47,6 @@ GLWidget::GLWidget(QWidget *parent) :
     pSlider2->setSingleStep(nSingleStep);  // 步长
     connect(pSpinBox2, SIGNAL(valueChanged(int)), pSlider2, SLOT(setValue(int)));
     connect(pSlider2, SIGNAL(valueChanged(int)), pSpinBox2, SLOT(setValue(int)));
-
 
     pSpinBox1sw = ui->spinBox_3;
     pSpinBox1sw->setMinimum(nMin);  // 最小值
@@ -103,96 +100,7 @@ void GLWidget::initializeGL(){
 
     this->initializeOpenGLFunctions();
 
-    // shaderFirst
-    bool success = shaderFirst.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/shaderFirst.vert");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
-        return;
-    }
-    success = shaderFirst.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/shaderFirst.frag");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
-        return;
-    }
-    success = shaderFirst.link();
-    if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
-    }
-
-    // shaderLast
-    success = shaderLast.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/shaderLast.vert");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
-        return;
-    }
-    success = shaderLast.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/shaderLast.frag");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderFirst.log();
-        return;
-    }
-    success = shaderLast.link();
-    if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderFirst.log();
-    }
-
-    // shaderWhitebalance
-    success = shaderWhitebalance.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/whitebalance.vert");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderWhitebalance.log();
-        return;
-    }
-    success = shaderWhitebalance.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/whitebalance.frag");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderWhitebalance.log();
-        return;
-    }
-    success = shaderWhitebalance.link();
-    if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderWhitebalance.log();
-    }
-
-    // shaderBrightness
-    success = shaderBrightness.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/brightness.vert");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderBrightness.log();
-        return;
-    }
-    success = shaderBrightness.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/brightness.frag");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderBrightness.log();
-        return;
-    }
-    success = shaderBrightness.link();
-    if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderBrightness.log();
-    }
-
-    // shaderSaturation
-    success = shaderSaturation.addShaderFromSourceFile(
-                QOpenGLShader::Vertex, "./shaders/saturation.vert");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderSaturation.log();
-        return;
-    }
-    success = shaderSaturation.addShaderFromSourceFile(
-                QOpenGLShader::Fragment, "./shaders/saturation.frag");
-    if (!success) {
-        qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderSaturation.log();
-        return;
-    }
-    success = shaderSaturation.link();
-    if(!success) {
-        qDebug() << "shaderProgram link failed!" << shaderSaturation.log();
-    }
-
+    createShader();
 
     //VAO，VBO data
     float vertices[] = {
@@ -236,7 +144,6 @@ void GLWidget::initializeGL(){
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
     glBindVertexArray(quadVAO);
@@ -259,15 +166,13 @@ void GLWidget::initializeGL(){
 
     mVideoCap.open("D:/My Documents/Pictures/Camera Roll/test.mp4");
 
-    // create transformations
+    // perview transform
     QMatrix4x4 transform;
     transform.rotate(180, QVector3D(0.0f, 0.0f, 0.0f));
-
     shaderFirst.bind();
     int transformLoc = shaderFirst.uniformLocation("transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.data());
     shaderFirst.release();
-
 
     // framebuffer1
     glGenFramebuffers(1, &FBO1);
@@ -385,4 +290,25 @@ void GLWidget::paintGL(){
     glDrawArrays(GL_TRIANGLES, 0, 6);
     shaderLast.release();
 
+}
+
+void GLWidget::createShader(){
+    createShaderProgram(shaderFirst,"./shaders/shaderFirst.vert","./shaders/shaderFirst.frag");
+    createShaderProgram(shaderLast,"./shaders/shaderLast.vert","./shaders/shaderLast.frag");
+    createShaderProgram(shaderWhitebalance,"./shaders/shaderLast.vert","./shaders/shaderWhitebalance.frag");
+    createShaderProgram(shaderBrightness,"./shaders/shaderLast.vert","./shaders/shaderBrightness.frag");
+    createShaderProgram(shaderSaturation,"./shaders/shaderLast.vert","./shaders/shaderSaturation.frag");
+}
+
+void GLWidget::createShaderProgram(
+        QOpenGLShaderProgram &shaderProgram,
+        const char* vertexPath, const char* fragmentPath){
+    bool success = false;
+    success = shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, vertexPath);
+    if (!success) {qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();return;}
+    success = shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, fragmentPath);
+    if (!success) {qDebug() << "shaderProgram addShaderFromSourceFile failed!" << shaderProgram.log();return;}
+    success = shaderProgram.link();
+    if(!success) {qDebug() << "shaderProgram link failed!" << shaderProgram.log();}
+    //return success;
 }
