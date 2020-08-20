@@ -1,9 +1,6 @@
 #include "glwidget.h"
 #include "ui_glwidget.h"
 
-#include <QDebug>
-#include <QTimer>
-
 #include "QDesktopWidget"
 
 GLWidget::GLWidget(QWidget *parent) :
@@ -295,9 +292,9 @@ void GLWidget::paintGL(){
 void GLWidget::createShader(){
     createShaderProgram(shaderFirst,"./shaders/shaderFirst.vert","./shaders/shaderFirst.frag");
     createShaderProgram(shaderLast,"./shaders/shaderLast.vert","./shaders/shaderLast.frag");
-    createShaderProgram(shaderWhitebalance,"./shaders/shaderLast.vert","./shaders/shaderWhitebalance.frag");
-    createShaderProgram(shaderBrightness,"./shaders/shaderLast.vert","./shaders/shaderBrightness.frag");
-    createShaderProgram(shaderSaturation,"./shaders/shaderLast.vert","./shaders/shaderSaturation.frag");
+    createShaderProgram(shaderWhitebalance,"./shaders/shaderLast.vert","./shaders/filterWhitebalance.frag");
+    createShaderProgram(shaderBrightness,"./shaders/shaderLast.vert","./shaders/filterBrightness.frag");
+    createShaderProgram(shaderSaturation,"./shaders/shaderLast.vert","./shaders/filterSaturation.frag");
 }
 
 void GLWidget::createShaderProgram(
