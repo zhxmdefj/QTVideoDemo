@@ -292,9 +292,9 @@ void GLWidget::paintGL(){
 void GLWidget::createShader(){
     createShaderProgram(shaderFirst,"./shaders/shaderFirst.vert","./shaders/shaderFirst.frag");
     createShaderProgram(shaderLast,"./shaders/shaderLast.vert","./shaders/shaderLast.frag");
-    createShaderProgram(shaderWhitebalance,"./shaders/shaderLast.vert","./shaders/filterWhitebalance.frag");
-    createShaderProgram(shaderBrightness,"./shaders/shaderLast.vert","./shaders/filterBrightness.frag");
-    createShaderProgram(shaderSaturation,"./shaders/shaderLast.vert","./shaders/filterSaturation.frag");
+    createShaderProgram(shaderWhitebalance,"./shaders/shaderLast.vert","./shaders/filter_Whitebalance.frag");
+    createShaderProgram(shaderBrightness,"./shaders/shaderLast.vert","./shaders/filter_Brightness.frag");
+    createShaderProgram(shaderSaturation,"./shaders/shaderLast.vert","./shaders/filter_Saturation.frag");
 }
 
 void GLWidget::createShaderProgram(
