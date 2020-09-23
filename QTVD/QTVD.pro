@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    bspline.cpp \
     cvcamera.cpp \
     glwidget.cpp \
     main.cpp \
@@ -25,9 +26,11 @@ SOURCES += \
     widget.cpp
 
 HEADERS += \
+    bspline.h \
     cvcamera.h \
     glwidget.h \
     qtglwidget.h \
+    vec2.h \
     widget.h
 
 FORMS += \
