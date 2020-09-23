@@ -1,6 +1,7 @@
 #include "cvcamera.h"
 #include "glwidget.h"
 #include "qtglwidget.h"
+#include "widget.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -9,9 +10,11 @@ int main(int argc, char *argv[])
     CVCamera window;
     GLWidget glWindow;
     QtGLwidget qtGlWindow;
+    Widget widget;
     glWindow.setWindowTitle(QObject::tr("GlWindow"));
     qtGlWindow.setWindowTitle(QObject::tr("QtGlWindow"));
-    glWindow.show();
+    //glWindow.show();
     //qtGlWindow.show();
+    widget.show();
     return a.exec();
 }

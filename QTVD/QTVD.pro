@@ -21,17 +21,20 @@ SOURCES += \
     cvcamera.cpp \
     glwidget.cpp \
     main.cpp \
-    qtglwidget.cpp
+    qtglwidget.cpp \
+    widget.cpp
 
 HEADERS += \
     cvcamera.h \
     glwidget.h \
-    qtglwidget.h
+    qtglwidget.h \
+    widget.h
 
 FORMS += \
     cvcamera.ui \
     glwidget.ui \
-    qtglwidget.ui
+    qtglwidget.ui \
+    widget.ui
 
 #添加库
 INCLUDEPATH += $$PWD/ffmpeg/include
